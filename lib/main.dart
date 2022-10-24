@@ -1,6 +1,4 @@
-import 'package:desktop_window/desktop_window.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'providers/providers.dart';
@@ -22,13 +20,16 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FluentApp(
-      theme: ThemeData(fontFamily: GoogleFonts.poppins().fontFamily),
-      title: 'Kikis',
+      theme: ThemeData(
+        fontFamily: GoogleFonts.poppins().fontFamily,
+      ),
+      title: 'Sistema de inventario',
       debugShowCheckedModeBanner: false,
       initialRoute: 'login',
       routes: {
         'login': (_) => const LoginScreen(),
-        'admin': (_) => const AdminScreen()
+        'admin': (_) => const AdminScreen(),
+        'admin/product': (_) => const AdminScreen()
       },
     );
   }

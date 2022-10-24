@@ -31,16 +31,14 @@ class AdminScreen extends StatelessWidget {
           ),
           items: [
             PaneItem(
-                icon: const Icon(FluentIcons.screen_time),
-                title: const Text('Panel')),
+                icon: const Icon(FluentIcons.user_window),
+                title: const Text('Usuarios'),
+                body: const PanelPage()),
             PaneItem(
                 icon: const Icon(FluentIcons.product),
-                title: const Text('Menú'))
+                title: const Text('Menú'),
+                body: const ProductsPage())
           ]),
-      content: NavigationBody(index: adminProvider.page, children: const [
-        PanelPage(),
-        ProductsPage(),
-      ]),
     );
   }
 }

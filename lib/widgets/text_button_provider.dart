@@ -14,21 +14,17 @@ class TextButtonProvider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      child: TextButton(
-        style: TextButton.styleFrom(
-          elevation: 10,
-          backgroundColor: backgroundColor,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
-        ),
-        onPressed: function,
-        child: Text(
-          text,
-          style: const TextStyle(color: Colors.white, fontSize: 16),
-        ),
+    return TextButton(
+      style: TextButton.styleFrom(
+        elevation: 10,
+        backgroundColor: backgroundColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+      ),
+      onPressed: function,
+      child: Text(
+        text,
+        style: const TextStyle(color: Colors.white, fontSize: 16),
       ),
     );
   }

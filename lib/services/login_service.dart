@@ -14,30 +14,31 @@ class LoginService {
       switch (response.statusCode) {
         case 200:
           return {
-            'succes': true,
+            'success': true,
             'user': Auth.fromJson(response.data),
             'token': response.data['token']
           };
         default:
-          return {'succes': false, 'msg': 'Status not valid'};
+          return {'success': false, 'msg': 'Status not valid'};
       }
     } on DioError catch (exception) {
-      return {'succes': false, 'msg': exception.toString()};
+      return {'success': false, 'msg': exception.toString()};
     }
   }
 
-  Future<Map<String, dynamic>> register(User user) async {
+  Future<Map<String, dynamic>> register(User user, String password) async {
     try {
-      final response = await _dio.post('register', data: user.toJson());
+      final response = await _dio.post('register',
+          data: {'name': user.name, 'email': user.email, 'password': password});
 
       switch (response.statusCode) {
         case 200:
-          return {'succes': true};
+          return {'success': true};
         default:
-          return {'succes': false, 'msg': 'Status not valid'};
+          return {'success': false, 'msg': 'Status not valid'};
       }
     } on DioError catch (exception) {
-      return {'succes': false, 'msg': exception.toString()};
+      return {'success': false, 'msg': exception.toString()};
     }
   }
 }

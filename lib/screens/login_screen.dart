@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:kikis_app/models/auth.dart';
+import 'package:kikis_app/models/user.dart';
 import 'package:kikis_app/providers/auth_provider.dart';
 import 'package:kikis_app/services/login_service.dart';
 import 'package:kikis_app/widgets/widgets.dart';
 import 'package:provider/provider.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -69,7 +70,7 @@ class RightPart extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: Container(
-        color: const Color.fromARGB(100, 0, 0, 0),
+        color: const Color.fromARGB(146, 0, 62, 121),
         child: PageView(
           controller: _pageController,
           children: [
@@ -126,17 +127,19 @@ class PageOne extends StatelessWidget {
                     function: context.watch<AuthProvider>().inLoad
                         ? null
                         : () {
-                            authProvider.changeLoad(true);
+                            // authProvider.cleanErrorBag();
+                            // authProvider.changeLoad(true);
                             // loginService
                             //     .login(controllers[0].text, controllers[1].text)
                             //     .then((value) {
                             //   var map = value;
-                            //   if (map['succes'] == true) {
-                            //     authProvider.auth = map['user'] as Auth;
-                            //     Navigator.pushReplacementNamed(
-                            //         context, 'admin');
+                            //   if (map['success'] == true) {
+                            //     // Navigator.pushReplacementNamed(
+                            //     //     context, 'admin');
+                            //     print(map['user']);
                             //   } else {
                             //     authProvider.changeLoad(false);
+                            //     authProvider.errorBag.add(map['msg']);
                             //   }
                             // });
                             Navigator.pushReplacementNamed(context, 'admin');
@@ -146,7 +149,7 @@ class PageOne extends StatelessWidget {
               ],
             ),
             const Divider(
-              color: Colors.white,
+              color: Colors.black,
             ),
             Row(
               children: [
@@ -161,7 +164,8 @@ class PageOne extends StatelessWidget {
                   },
                 ))
               ],
-            )
+            ),
+            DisplayErrors(authProvider: authProvider)
           ],
         ),
       )
@@ -170,49 +174,100 @@ class PageOne extends StatelessWidget {
 }
 
 class PageTwo extends StatelessWidget {
-  const PageTwo(
-      {Key? key, required this.pageController, required this.loginService})
+  PageTwo({Key? key, required this.pageController, required this.loginService})
       : super(key: key);
 
   final PageController pageController;
   final LoginService loginService;
+  final List<TextEditingController> controllers = List.generate(4, (i) {
+    return TextEditingController();
+  });
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-      const TextFormFieldProvider(
+      TextFormFieldProvider(
         hintText: 'Nombre',
         iconData: FontAwesomeIcons.user,
+        controller: controllers[0],
       ),
-      const TextFormFieldProvider(
+      TextFormFieldProvider(
         hintText: 'Correo electrónico',
         iconData: Icons.email,
+        controller: controllers[1],
       ),
-      const TextFormFieldProvider(
+      TextFormFieldProvider(
         hintText: 'Contraseña',
         iconData: FontAwesomeIcons.lock,
         obscureText: true,
+        controller: controllers[2],
       ),
-      const TextFormFieldProvider(
+      TextFormFieldProvider(
         hintText: 'Confirmar Contraseña',
         iconData: FontAwesomeIcons.lock,
         obscureText: true,
+        controller: controllers[3],
       ),
       Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
             Row(
-              children: const [
+              children: [
                 Expanded(
                   child: TextButtonProvider(
                     text: 'Registrarce',
+                    function: context.watch<AuthProvider>().inLoad
+                        ? null
+                        : () {
+                            authProvider.cleanErrorBag();
+                            authProvider.changeLoad(true);
+                            if (controllers[2].text != controllers[3].text) {
+                              authProvider.errorBag
+                                  .add('Las contraseñas no coinciden.');
+                            } else {
+                              User user = User(
+                                  name: controllers[0].text,
+                                  email: controllers[1].text,
+                                  password: null);
+                              loginService
+                                  .register(user, controllers[2].text)
+                                  .then((value) {
+                                var map = value;
+                                if (map['success'] == true) {
+                                  Alert(
+                                    context: context,
+                                    title: "Se ha registrado con éxito",
+                                    desc:
+                                        "Debe esperar a que se confirme su identidad para poder acceder al sistema.",
+                                    buttons: [
+                                      DialogButton(
+                                        onPressed: () => Navigator.pop(context),
+                                        width: 120,
+                                        child: const Text(
+                                          "Cerrar",
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 20),
+                                        ),
+                                      )
+                                    ],
+                                  ).show();
+                                } else {
+                                  authProvider.changeLoad(false);
+                                  authProvider.errorBag.add(map['msg']);
+                                }
+                              });
+                            }
+                          },
                   ),
                 ),
               ],
             ),
             const Divider(
-              color: Colors.white,
+              color: Colors.black,
             ),
             Row(
               children: [
@@ -227,10 +282,49 @@ class PageTwo extends StatelessWidget {
                   },
                 ))
               ],
-            )
+            ),
+            DisplayErrors(authProvider: authProvider)
           ],
         ),
       )
     ]);
+  }
+}
+
+class DisplayErrors extends StatelessWidget {
+  const DisplayErrors({
+    Key? key,
+    required this.authProvider,
+  }) : super(key: key);
+
+  final AuthProvider authProvider;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      margin: const EdgeInsets.symmetric(vertical: 30, horizontal: 10),
+      padding: const EdgeInsets.all(10),
+      width: double.infinity,
+      height: context.watch<AuthProvider>().errorBag.isNotEmpty ? 200 : 0,
+      decoration: BoxDecoration(
+          color: const Color.fromARGB(50, 255, 255, 255),
+          border:
+              Border.all(color: const Color.fromARGB(255, 121, 4, 4), width: 3),
+          borderRadius: const BorderRadius.all(Radius.circular(10))),
+      child: SingleChildScrollView(
+          child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: authProvider.errorBag
+            .map((error) => Text(
+                  "* $error",
+                  style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromARGB(255, 121, 4, 4)),
+                ))
+            .toList(),
+      )),
+    );
   }
 }
