@@ -33,44 +33,46 @@ class PanelPage extends StatelessWidget {
               child: Padding(
                 padding:
                     const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
-                child: DataTable(
-                  columns: <DataColumn>[
-                    DataColumn(
-                        label: Text(
-                      "Nombre",
-                      style: styleColumn(),
-                    )),
-                    DataColumn(
-                      label: Text(
-                        "Correo",
+                child: SingleChildScrollView(
+                  child: DataTable(
+                    columns: <DataColumn>[
+                      DataColumn(
+                          label: Text(
+                        "Nombre",
                         style: styleColumn(),
+                      )),
+                      DataColumn(
+                        label: Text(
+                          "Correo",
+                          style: styleColumn(),
+                        ),
                       ),
-                    ),
-                    DataColumn(
-                        label: Text(
-                      "Editar",
-                      style: styleColumn(),
-                    )),
-                    DataColumn(
-                        label: Text(
-                      "Eliminar",
-                      style: styleColumn(),
-                    )),
-                  ],
-                  rows: users
-                      .map((user) => DataRow(cells: [
-                            DataCell(Text(user.name)),
-                            DataCell(Text(user.email)),
-                            const DataCell(Button(
-                              onPressed: null,
-                              child: Text('Editar'),
-                            )),
-                            const DataCell(Button(
-                              onPressed: null,
-                              child: Text('Eliminar'),
-                            )),
-                          ]))
-                      .toList(),
+                      DataColumn(
+                          label: Text(
+                        "Editar",
+                        style: styleColumn(),
+                      )),
+                      DataColumn(
+                          label: Text(
+                        "Eliminar",
+                        style: styleColumn(),
+                      )),
+                    ],
+                    rows: users
+                        .map((user) => DataRow(cells: [
+                              DataCell(Text(user.name)),
+                              DataCell(Text(user.email)),
+                              const DataCell(Button(
+                                onPressed: null,
+                                child: Text('Editar'),
+                              )),
+                              const DataCell(Button(
+                                onPressed: null,
+                                child: Text('Eliminar'),
+                              )),
+                            ]))
+                        .toList(),
+                  ),
                 ),
               ),
             )

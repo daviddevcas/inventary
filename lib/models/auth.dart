@@ -20,7 +20,7 @@ class Auth extends User {
 
   static Auth fromJson(Map<String, dynamic> data) {
     return Auth(
-        name: data['name'],
+        name: data['displayName'],
         email: data['email'],
         password: data['password'],
         token: data['token']);

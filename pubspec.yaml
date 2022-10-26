@@ -43,6 +43,7 @@ dependencies:
   desktop_window: ^0.4.0
   dio: ^4.0.6
   rflutter_alert: ^2.0.4
+  cached_network_image: ^3.2.2
 
 dev_dependencies:
   flutter_test:

@@ -18,10 +18,53 @@ class AdminProvider extends ChangeNotifier {
         description: 'silla',
         classroom: 'E05',
         count: 5,
-        reports: null)
+        reports: null),
+    Product(
+        name: 'mesa',
+        description: 'silla',
+        classroom: 'E05',
+        count: 5,
+        reports: null),
+    Product(
+        name: 'silla',
+        description: 'silla',
+        classroom: 'E05',
+        count: 5,
+        reports: null),
+    Product(
+        name: 'mesa',
+        description: 'silla',
+        classroom: 'E05',
+        count: 5,
+        reports: null),
+    Product(
+        name: 'silla',
+        description: 'silla',
+        classroom: 'E05',
+        count: 5,
+        reports: null),
+    Product(
+        name: 'mesa',
+        description: 'silla',
+        classroom: 'E05',
+        count: 5,
+        reports: null),
+    Product(
+        name: 'silla',
+        description: 'silla',
+        classroom: 'E05',
+        count: 5,
+        reports: null),
+    Product(
+        name: 'mesa',
+        description: 'silla',
+        classroom: 'E05',
+        count: 5,
+        reports: null),
   ];
 
-  void hoverProduct(int index) {
+  void hoverProduct(Product product) {
+    int index = products.indexOf(product);
     products[index].size = products[index].size == 250 ? 300 : 250;
     notifyListeners();
   }

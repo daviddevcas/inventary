@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -29,13 +30,17 @@ class LeftPart extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       flex: 2,
-      child: Stack(children: [
-        Container(
-          decoration: const BoxDecoration(
-              image: DecorationImage(
-                  fit: BoxFit.cover,
-                  image: NetworkImage(
-                      'https://as1.ftcdn.net/v2/jpg/04/89/52/56/1000_F_489525623_IIJHFNGgs9iepLpIBRqky7ketVqDuCvZ.jpg'))),
+      child: Stack(fit: StackFit.expand, children: [
+        Expanded(
+          child: CachedNetworkImage(
+            fit: BoxFit.fill,
+            imageUrl:
+                'https://as1.ftcdn.net/v2/jpg/04/89/52/56/1000_F_489525623_IIJHFNGgs9iepLpIBRqky7ketVqDuCvZ.jpg',
+            placeholder: (context, url) =>
+                const Center(child: CircularProgressIndicator()),
+            errorWidget: (context, url, error) =>
+                const Center(child: Icon(Icons.error)),
+          ),
         ),
         Container(
           decoration: const BoxDecoration(
@@ -127,22 +132,21 @@ class PageOne extends StatelessWidget {
                     function: context.watch<AuthProvider>().inLoad
                         ? null
                         : () {
-                            // authProvider.cleanErrorBag();
-                            // authProvider.changeLoad(true);
-                            // loginService
-                            //     .login(controllers[0].text, controllers[1].text)
-                            //     .then((value) {
-                            //   var map = value;
-                            //   if (map['success'] == true) {
-                            //     // Navigator.pushReplacementNamed(
-                            //     //     context, 'admin');
-                            //     print(map['user']);
-                            //   } else {
-                            //     authProvider.changeLoad(false);
-                            //     authProvider.errorBag.add(map['msg']);
-                            //   }
-                            // });
-                            Navigator.pushReplacementNamed(context, 'admin');
+                            authProvider.cleanErrorBag();
+                            authProvider.changeLoad(true);
+                            loginService
+                                .login(controllers[0].text, controllers[1].text)
+                                .then((value) {
+                              var map = value;
+                              if (map['success'] == true) {
+                                Navigator.pushReplacementNamed(
+                                    context, 'admin');
+                              } else {
+                                authProvider.changeLoad(false);
+                                authProvider.errorBag.add(map['msg']);
+                              }
+                            });
+                            // Navigator.pushReplacementNamed(context, 'admin');
                           },
                   ),
                 ),
