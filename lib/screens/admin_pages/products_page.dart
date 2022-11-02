@@ -2,15 +2,17 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:kikis_app/models/product.dart';
 import 'package:kikis_app/providers/admin_provider.dart';
+import 'package:kikis_app/providers/product_provider.dart';
 import 'package:kikis_app/screens/product_screen.dart';
+import 'package:kikis_app/ui/image_path.dart';
 import 'package:provider/provider.dart';
 
 class ProductsPage extends StatelessWidget {
-  const ProductsPage({Key? key}) : super(key: key);
+  const ProductsPage({Key? key, required this.adminProvider}) : super(key: key);
 
+  final AdminProvider adminProvider;
   @override
   Widget build(BuildContext context) {
-    final adminProvider = Provider.of<AdminProvider>(context);
     final products = adminProvider.products;
 
     return ScaffoldPage(
@@ -20,42 +22,47 @@ class ProductsPage extends StatelessWidget {
       content: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 30),
-          child: Row(children: const [
-            Button(onPressed: null, child: Text('Actualizar'))
+          child: Row(children: [
+            Button(
+                onPressed: () {
+                  adminProvider.updateProducts();
+                },
+                child: const Text('Actualizar'))
           ]),
         ),
         Expanded(
-            child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
-                child: SingleChildScrollView(
-                  child: Wrap(
-                    children: products
-                        .map((product) => ProductWidget(
-                              product: product,
-                            ))
-                        .toList(),
-                  ),
-                )))
+            child: SingleChildScrollView(
+          child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+              child: Wrap(
+                children: products
+                    .map((product) => ProductWidget(
+                          adminProvider: adminProvider,
+                          product: product,
+                        ))
+                    .toList(),
+              )),
+        ))
       ]),
     );
   }
 }
 
 class ProductWidget extends StatelessWidget {
-  const ProductWidget({
-    Key? key,
-    required this.product,
-  }) : super(key: key);
+  const ProductWidget(
+      {Key? key, required this.product, required this.adminProvider})
+      : super(key: key);
 
+  final AdminProvider adminProvider;
   final Product product;
 
   @override
   Widget build(BuildContext context) {
-    final adminProvider = Provider.of<AdminProvider>(context);
+    final productProvider = Provider.of<ProductProvider>(context);
 
     return GestureDetector(
       onTap: () {
+        productProvider.product = product;
         Navigator.push(context,
             FluentPageRoute(builder: (context) => const ProductScreen()));
       },
@@ -91,15 +98,7 @@ class ProductWidget extends StatelessWidget {
             child: Stack(
               fit: StackFit.expand,
               children: [
-                CachedNetworkImage(
-                  fit: BoxFit.fill,
-                  imageUrl:
-                      'https://www.nicepng.com/png/full/304-3048415_business-advice-product-icon-png.png',
-                  placeholder: (context, url) =>
-                      const Center(child: ProgressRing()),
-                  errorWidget: (context, url, error) =>
-                      const Center(child: Icon(FluentIcons.error)),
-                ),
+                ImagePath(path: product.pathPhoto),
                 Positioned(
                     bottom: 15,
                     left: 15,

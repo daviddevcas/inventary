@@ -1,8 +1,11 @@
 import 'package:flutter/cupertino.dart';
+import 'package:kikis_app/models/auth.dart';
 
 class AuthProvider extends ChangeNotifier {
   bool _inLoad = false;
   List<String> errorBag = [];
+
+  late final Auth? auth;
 
   bool get inLoad => _inLoad;
 

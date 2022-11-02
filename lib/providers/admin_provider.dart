@@ -1,67 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:kikis_app/models/product.dart';
 import 'package:kikis_app/models/user.dart';
+import 'package:kikis_app/services/admin_service.dart';
 
 class AdminProvider extends ChangeNotifier {
-  int _page = 0;
+  int page = 0;
 
-  int get page => _page;
+  List<User> users = [];
+  List<Product> products = [];
 
-  List<User> users = [
-    User(name: 'david', email: 'daviddisjoint@gmail.com', password: 'password'),
-    User(name: 'alan', email: 'alan12@hotmail.com', password: 'password'),
-  ];
-
-  List<Product> products = [
-    Product(
-        name: 'silla',
-        description: 'silla',
-        classroom: 'E05',
-        count: 5,
-        reports: null),
-    Product(
-        name: 'mesa',
-        description: 'silla',
-        classroom: 'E05',
-        count: 5,
-        reports: null),
-    Product(
-        name: 'silla',
-        description: 'silla',
-        classroom: 'E05',
-        count: 5,
-        reports: null),
-    Product(
-        name: 'mesa',
-        description: 'silla',
-        classroom: 'E05',
-        count: 5,
-        reports: null),
-    Product(
-        name: 'silla',
-        description: 'silla',
-        classroom: 'E05',
-        count: 5,
-        reports: null),
-    Product(
-        name: 'mesa',
-        description: 'silla',
-        classroom: 'E05',
-        count: 5,
-        reports: null),
-    Product(
-        name: 'silla',
-        description: 'silla',
-        classroom: 'E05',
-        count: 5,
-        reports: null),
-    Product(
-        name: 'mesa',
-        description: 'silla',
-        classroom: 'E05',
-        count: 5,
-        reports: null),
-  ];
+  final adminService = AdminService();
 
   void hoverProduct(Product product) {
     int index = products.indexOf(product);
@@ -70,7 +18,34 @@ class AdminProvider extends ChangeNotifier {
   }
 
   void changePage(int value) {
-    _page = value;
+    page = value;
     notifyListeners();
+  }
+
+  void updateUsers() {
+    adminService.getUsers().then((value) {
+      var map = value;
+
+      if (map['success'] == true) {
+        users = map['users'];
+        notifyListeners();
+      }
+    });
+  }
+
+  void updateUser(User user) {
+    adminService.updateUser(user);
+    notifyListeners();
+  }
+
+  void updateProducts() {
+    adminService.getProducts().then((value) {
+      var map = value;
+
+      if (map['success'] == true) {
+        products = map['products'];
+        notifyListeners();
+      }
+    });
   }
 }

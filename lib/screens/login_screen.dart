@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kikis_app/models/user.dart';
+import 'package:kikis_app/providers/admin_provider.dart';
 import 'package:kikis_app/providers/auth_provider.dart';
 import 'package:kikis_app/services/login_service.dart';
 import 'package:kikis_app/widgets/widgets.dart';
@@ -31,16 +32,14 @@ class LeftPart extends StatelessWidget {
     return Expanded(
       flex: 2,
       child: Stack(fit: StackFit.expand, children: [
-        Expanded(
-          child: CachedNetworkImage(
-            fit: BoxFit.fill,
-            imageUrl:
-                'https://as1.ftcdn.net/v2/jpg/04/89/52/56/1000_F_489525623_IIJHFNGgs9iepLpIBRqky7ketVqDuCvZ.jpg',
-            placeholder: (context, url) =>
-                const Center(child: CircularProgressIndicator()),
-            errorWidget: (context, url, error) =>
-                const Center(child: Icon(Icons.error)),
-          ),
+        CachedNetworkImage(
+          fit: BoxFit.fill,
+          imageUrl:
+              'https://firebasestorage.googleapis.com/v0/b/inventario-24e0c.appspot.com/o/background.jpg?alt=media&token=379049c9-046e-4e05-afa8-cdb5b24baf48',
+          placeholder: (context, url) =>
+              const Center(child: CircularProgressIndicator()),
+          errorWidget: (context, url, error) =>
+              const Center(child: Icon(Icons.error)),
         ),
         Container(
           decoration: const BoxDecoration(
@@ -73,40 +72,58 @@ class RightPart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
+
     return Expanded(
-      child: Container(
-        color: const Color.fromARGB(146, 0, 62, 121),
-        child: PageView(
-          controller: _pageController,
-          children: [
-            PageOne(
-              pageController: _pageController,
-              loginService: _loginService,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Container(
+            color: const Color.fromARGB(146, 0, 62, 121),
+            child: PageView(
+              controller: _pageController,
+              children: [
+                PageOne(
+                  pageController: _pageController,
+                  loginService: _loginService,
+                  authProvider: authProvider,
+                ),
+                PageTwo(
+                  pageController: _pageController,
+                  loginService: _loginService,
+                  authProvider: authProvider,
+                )
+              ],
             ),
-            PageTwo(
-              pageController: _pageController,
-              loginService: _loginService,
-            )
-          ],
-        ),
+          ),
+          if (authProvider.inLoad)
+            Container(
+                color: const Color.fromARGB(100, 255, 255, 255),
+                child: const Center(child: CircularProgressIndicator()))
+        ],
       ),
     );
   }
 }
 
 class PageOne extends StatelessWidget {
-  PageOne({Key? key, required this.pageController, required this.loginService})
+  PageOne(
+      {Key? key,
+      required this.pageController,
+      required this.loginService,
+      required this.authProvider})
       : super(key: key);
 
   final PageController pageController;
   final LoginService loginService;
+  final AuthProvider authProvider;
   final List<TextEditingController> controllers = List.generate(2, (i) {
     return TextEditingController();
   });
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final adminProvider = Provider.of<AdminProvider>(context);
 
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
       TextFormFieldProvider(
@@ -131,7 +148,7 @@ class PageOne extends StatelessWidget {
                     text: 'Iniciar sesión',
                     function: context.watch<AuthProvider>().inLoad
                         ? null
-                        : () {
+                        : () async {
                             authProvider.cleanErrorBag();
                             authProvider.changeLoad(true);
                             loginService
@@ -139,14 +156,16 @@ class PageOne extends StatelessWidget {
                                 .then((value) {
                               var map = value;
                               if (map['success'] == true) {
+                                authProvider.auth = map['auth'];
+                                adminProvider.updateUsers();
+                                adminProvider.updateProducts();
                                 Navigator.pushReplacementNamed(
                                     context, 'admin');
                               } else {
-                                authProvider.changeLoad(false);
                                 authProvider.errorBag.add(map['msg']);
+                                authProvider.changeLoad(false);
                               }
                             });
-                            // Navigator.pushReplacementNamed(context, 'admin');
                           },
                   ),
                 ),
@@ -159,7 +178,7 @@ class PageOne extends StatelessWidget {
               children: [
                 Expanded(
                     child: TextButtonProvider(
-                  text: 'Registrarce',
+                  text: 'Registrarse',
                   backgroundColor: Colors.blueGrey,
                   function: () {
                     pageController.animateToPage(1,
@@ -178,19 +197,22 @@ class PageOne extends StatelessWidget {
 }
 
 class PageTwo extends StatelessWidget {
-  PageTwo({Key? key, required this.pageController, required this.loginService})
+  PageTwo(
+      {Key? key,
+      required this.pageController,
+      required this.loginService,
+      required this.authProvider})
       : super(key: key);
 
   final PageController pageController;
   final LoginService loginService;
+  final AuthProvider authProvider;
   final List<TextEditingController> controllers = List.generate(4, (i) {
     return TextEditingController();
   });
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
       TextFormFieldProvider(
         hintText: 'Nombre',
@@ -228,14 +250,16 @@ class PageTwo extends StatelessWidget {
                         : () {
                             authProvider.cleanErrorBag();
                             authProvider.changeLoad(true);
-                            if (controllers[2].text != controllers[3].text) {
+                            if (controllers[2].text != controllers[3].text &&
+                                controllers[2].text != '') {
                               authProvider.errorBag
                                   .add('Las contraseñas no coinciden.');
+                              authProvider.changeLoad(false);
                             } else {
                               User user = User(
                                   name: controllers[0].text,
                                   email: controllers[1].text,
-                                  password: null);
+                                  status: false);
                               loginService
                                   .register(user, controllers[2].text)
                                   .then((value) {
@@ -259,9 +283,10 @@ class PageTwo extends StatelessWidget {
                                       )
                                     ],
                                   ).show();
-                                } else {
                                   authProvider.changeLoad(false);
+                                } else {
                                   authProvider.errorBag.add(map['msg']);
+                                  authProvider.changeLoad(false);
                                 }
                               });
                             }

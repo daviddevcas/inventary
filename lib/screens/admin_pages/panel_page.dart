@@ -1,16 +1,15 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' as material;
 import 'package:kikis_app/providers/admin_provider.dart';
-import 'package:provider/provider.dart';
 
 class PanelPage extends StatelessWidget {
-  const PanelPage({Key? key}) : super(key: key);
+  const PanelPage({Key? key, required this.adminProvider}) : super(key: key);
+
+  final AdminProvider adminProvider;
 
   @override
   Widget build(BuildContext context) {
-    final adminService = Provider.of<AdminProvider>(context);
-
-    final users = adminService.users;
+    final users = adminProvider.users;
 
     return ScaffoldPage(
       header: const PageHeader(
@@ -24,8 +23,15 @@ class PanelPage extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 30),
-              child: Row(children: const [
-                Button(onPressed: null, child: Text('Actualizar'))
+              child: Row(children: [
+                MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: Button(
+                      onPressed: () {
+                        adminProvider.updateUsers();
+                      },
+                      child: const Text('Actualizar')),
+                )
               ]),
             ),
             SizedBox(
@@ -34,41 +40,41 @@ class PanelPage extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
                 child: SingleChildScrollView(
-                  child: DataTable(
-                    columns: <DataColumn>[
-                      DataColumn(
+                  child: material.DataTable(
+                    columns: <material.DataColumn>[
+                      material.DataColumn(
+                          label: Text(
+                        "ID",
+                        style: styleColumn(),
+                      )),
+                      material.DataColumn(
                           label: Text(
                         "Nombre",
                         style: styleColumn(),
                       )),
-                      DataColumn(
+                      material.DataColumn(
                         label: Text(
                           "Correo",
                           style: styleColumn(),
                         ),
                       ),
-                      DataColumn(
+                      material.DataColumn(
                           label: Text(
-                        "Editar",
-                        style: styleColumn(),
-                      )),
-                      DataColumn(
-                          label: Text(
-                        "Eliminar",
+                        "Estado",
                         style: styleColumn(),
                       )),
                     ],
                     rows: users
-                        .map((user) => DataRow(cells: [
-                              DataCell(Text(user.name)),
-                              DataCell(Text(user.email)),
-                              const DataCell(Button(
-                                onPressed: null,
-                                child: Text('Editar'),
-                              )),
-                              const DataCell(Button(
-                                onPressed: null,
-                                child: Text('Eliminar'),
+                        .map((user) => material.DataRow(cells: [
+                              material.DataCell(Text(user.id!)),
+                              material.DataCell(Text(user.name)),
+                              material.DataCell(Text(user.email)),
+                              material.DataCell(Checkbox(
+                                checked: user.status,
+                                onChanged: (value) {
+                                  user.status = value!;
+                                  adminProvider.updateUser(user);
+                                },
                               )),
                             ]))
                         .toList(),

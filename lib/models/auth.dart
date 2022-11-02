@@ -4,7 +4,7 @@ class Auth extends User {
   Auth(
       {required super.name,
       required super.email,
-      required super.password,
+      required super.status,
       required this.token});
 
   String? token;
@@ -15,14 +15,15 @@ class Auth extends User {
     data['name'] = name;
     data['email'] = email;
     data['token'] = token;
+    data['status'] = status;
     return data;
   }
 
   static Auth fromJson(Map<String, dynamic> data) {
     return Auth(
-        name: data['displayName'],
+        name: data['name'],
         email: data['email'],
-        password: data['password'],
-        token: data['token']);
+        token: data['token'],
+        status: data['status']);
   }
 }

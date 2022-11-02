@@ -1,21 +1,22 @@
 class User {
-  User({required this.name, required this.email, required this.password});
+  User(
+      {this.id, required this.name, required this.email, required this.status});
 
-  final String name;
-  final String email;
-  final String? password;
+  String name;
+  String email;
+  String? id;
+  bool status;
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['nombre'] = name;
     data['correo'] = email;
+    data['estado'] = status;
     return data;
   }
 
   static User fromJson(Map<String, dynamic> data) {
     return User(
-        name: data['nombre'],
-        email: data['correo'],
-        password: data['contraseña']);
+        name: data['nombre'], email: data['correo'], status: data['estado']);
   }
 }
