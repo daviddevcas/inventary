@@ -93,31 +93,47 @@ class InformationPage extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Button(
+                              onPressed: !productProvider.isLoading
+                                  ? () async {
+                                      productProvider.stateLoaging(true);
+                                      try {
+                                        FilePickerCross file =
+                                            await FilePickerCross
+                                                .importFromStorage(
+                                          type: FileTypeCross.image,
+                                        );
+
+                                        productProvider
+                                            .updateSelectedProductImage(
+                                                file.path!);
+                                      } catch (e) {
+                                        productProvider.stateLoaging(false);
+                                        return;
+                                      }
+                                      productProvider.stateLoaging(false);
+                                    }
+                                  : null,
                               child: Row(
                                 children: const [
                                   Text('Subir imágen '),
                                   Icon(FluentIcons.upload)
                                 ],
-                              ),
-                              onPressed: () async {
-                                try {
-                                  FilePickerCross file =
-                                      await FilePickerCross.importFromStorage(
-                                    type: FileTypeCross.image,
-                                  );
-
-                                  productProvider
-                                      .updateSelectedProductImage(file.path!);
-                                } catch (e) {
-                                  return;
-                                }
-                              }),
+                              )),
                           const SizedBox(
                             width: 30,
                           ),
                           Button(
-                              child: const Text('Guardar información'),
-                              onPressed: () {})
+                              onPressed: !productProvider.isSaving
+                                  ? () {
+                                      productProvider.stateSaving(true);
+                                      product.name = controllers[0].text;
+                                      product.classroom = controllers[1].text;
+                                      product.description = controllers[2].text;
+                                      productProvider.updateProduct();
+                                      productProvider.stateSaving(false);
+                                    }
+                                  : null,
+                              child: const Text('Guardar información'))
                         ],
                       ),
                     )

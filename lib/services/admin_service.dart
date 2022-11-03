@@ -9,7 +9,8 @@ class AdminService {
       baseUrl: 'https://inventario-24e0c-default-rtdb.firebaseio.com'));
 
   final Dio _dioStorage = Dio(BaseOptions(
-      baseUrl: 'https://inventario-24e0c-default-rtdb.firebaseio.com'));
+      baseUrl:
+          'https://api.cloudinary.com/v1_1/instituto-tecnol-gico-superior-de-poza-rica/image/'));
 
   Future<Map<String, dynamic>> getUsers() async {
     List<User> users = [];
@@ -65,22 +66,33 @@ class AdminService {
     return {'products': products, 'success': true};
   }
 
-  Future<Map<String, dynamic>> uploadImage(File pictureFile) async {
+  Future<Map<String, dynamic>> updateProduct(
+      Product product, File? file) async {
     try {
-      String fileName = pictureFile.path.split('/').last;
-
-      FormData data = FormData.fromMap({
-        "file": await MultipartFile.fromFile(
-          pictureFile.path,
-          filename: fileName,
-        ),
-      });
-
-      final request =
-          _dioStorage.post("http://192.168.43.225/api/media", data: data);
+      if (file != null) {
+        _uploadImage(file).then((value) {
+          product.pathPhoto = value;
+          _dio.put('/inventario/productos/${product.id}.json',
+              data: product.toJson());
+        });
+      } else {
+        await _dio.put('/inventario/productos/${product.id}.json',
+            data: product.toJson());
+      }
     } catch (e) {
       return {'success': false};
     }
     return {'success': true};
+  }
+
+  Future<String> _uploadImage(File pictureFile) async {
+    FormData formData = FormData.fromMap({
+      'file': await MultipartFile.fromFile(pictureFile.path,
+          filename: pictureFile.path.split('/').last),
+    });
+    final response =
+        await _dioStorage.post('upload?upload_preset=lhjj81vx', data: formData);
+
+    return response.data['secure_url'];
   }
 }

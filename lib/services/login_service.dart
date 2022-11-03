@@ -12,7 +12,7 @@ class LoginService {
 
   Future<Map<String, dynamic>> login(String email, String password) async {
     try {
-      final User? user = await getUser(email);
+      final User? user = await _getUser(email);
 
       if (user == null || !user.status) {
         throw Exception('No access');
@@ -53,7 +53,7 @@ class LoginService {
         'password': password,
         'returnSecureToken': true
       });
-      await createUser(user);
+      await _createUser(user);
 
       switch (response.statusCode) {
         case 200:
@@ -70,7 +70,7 @@ class LoginService {
     }
   }
 
-  Future<User?> getUser(String email) async {
+  Future<User?> _getUser(String email) async {
     User? user;
     final request = await _dio.get(
       '/inventario/usuarios.json',
@@ -84,7 +84,7 @@ class LoginService {
     return user;
   }
 
-  Future createUser(User user) async {
+  Future _createUser(User user) async {
     await _dio.post('/inventario/usuarios.json', data: user.toJson());
   }
 }
