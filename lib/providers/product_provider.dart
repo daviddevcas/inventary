@@ -2,13 +2,17 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:kikis_app/models/product.dart';
+import 'package:kikis_app/models/report.dart';
 import 'package:kikis_app/services/admin_service.dart';
 
 class ProductProvider extends ChangeNotifier {
-  Product? product;
-  File? pictureFile;
+  Product product = Product(name: '', description: '', classroom: '');
+  List<Report> reports = [];
+
   bool isLoading = false, isSaving = false;
   int page = 0;
+
+  File? pictureFile;
 
   final adminService = AdminService();
 
@@ -22,25 +26,52 @@ class ProductProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void stateSaving(bool value) {
-    isSaving = value;
-    notifyListeners();
-  }
-
   void updateSelectedProductImage(String path) {
-    product?.pathPhoto = path;
+    product.pathPhoto = path;
     pictureFile = File.fromUri(Uri(path: path));
     notifyListeners();
   }
 
-  void updateProduct() {
-    adminService.updateProduct(product!, pictureFile).then((value) {
-      var map = value;
+  void addReport() {
+    if (product.reports == null) {
+      product.reports = <Report>[
+        Report(subject: 'Reporte nuevo', description: '', classroom: '')
+      ];
+    } else {
+      product.reports!.add(
+          Report(subject: 'Reporte nuevo', description: '', classroom: ''));
+    }
+    notifyListeners();
+  }
 
-      if (map['success'] == true) {
-        notifyListeners();
-        pictureFile = null;
-      }
-    });
+  Future refreshProduct() async {
+    isLoading = true;
+    notifyListeners();
+
+    String id = product.id!;
+
+    var response = await adminService.getProduct(id);
+
+    if (response['success'] == true && response['product'] != null) {
+      product = response['product'];
+      product.id = id;
+    }
+
+    isLoading = false;
+    notifyListeners();
+  }
+
+  Future updateProduct() async {
+    isSaving = true;
+    notifyListeners();
+
+    Map<String, dynamic> map =
+        await adminService.updateProduct(product, pictureFile);
+
+    if (map['sucess'] == true) {
+      pictureFile = null;
+    }
+    isSaving = false;
+    notifyListeners();
   }
 }

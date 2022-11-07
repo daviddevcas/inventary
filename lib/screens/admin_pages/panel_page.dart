@@ -27,9 +27,11 @@ class PanelPage extends StatelessWidget {
                 MouseRegion(
                   cursor: SystemMouseCursors.click,
                   child: Button(
-                      onPressed: () {
-                        adminProvider.updateUsers();
-                      },
+                      onPressed: !adminProvider.isUpdateUsers
+                          ? () {
+                              adminProvider.updateUsers();
+                            }
+                          : null,
                       child: const Text('Actualizar')),
                 )
               ]),
@@ -69,12 +71,15 @@ class PanelPage extends StatelessWidget {
                               material.DataCell(Text(user.id!)),
                               material.DataCell(Text(user.name)),
                               material.DataCell(Text(user.email)),
-                              material.DataCell(Checkbox(
-                                checked: user.status,
-                                onChanged: (value) {
-                                  user.status = value!;
-                                  adminProvider.updateUser(user);
-                                },
+                              material.DataCell(MouseRegion(
+                                cursor: SystemMouseCursors.click,
+                                child: Checkbox(
+                                  checked: user.status,
+                                  onChanged: (value) {
+                                    user.status = value!;
+                                    adminProvider.updateUser(user);
+                                  },
+                                ),
                               )),
                             ]))
                         .toList(),

@@ -30,7 +30,6 @@ class MyApp extends StatelessWidget {
       routes: {
         'login': (_) => const LoginScreen(),
         'admin': (_) => const AdminScreen(),
-        'admin/product': (_) => const AdminScreen()
       },
     );
   }

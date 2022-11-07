@@ -1,7 +1,6 @@
 import 'package:file_picker_cross/file_picker_cross.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:kikis_app/models/product.dart';
-import 'package:kikis_app/ui/image_path.dart';
+import 'package:kikis_app/widgets/image_path.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:kikis_app/providers/product_provider.dart';
 
@@ -15,8 +14,7 @@ class InformationPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final product = productProvider.product ??
-        Product(name: '', description: '', classroom: '');
+    final product = productProvider.product;
 
     controllers[0].text = product.name;
     controllers[1].text = product.classroom;
@@ -88,52 +86,61 @@ class InformationPage extends StatelessWidget {
                         )),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Row(
+                      child: Wrap(
                         verticalDirection: VerticalDirection.down,
-                        mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          Button(
-                              onPressed: !productProvider.isLoading
-                                  ? () async {
-                                      productProvider.stateLoaging(true);
-                                      try {
-                                        FilePickerCross file =
-                                            await FilePickerCross
-                                                .importFromStorage(
-                                          type: FileTypeCross.image,
-                                        );
+                          MouseRegion(
+                            cursor: SystemMouseCursors.click,
+                            child: Button(
+                                onPressed: !productProvider.isLoading
+                                    ? () async {
+                                        productProvider.stateLoaging(true);
+                                        try {
+                                          FilePickerCross file =
+                                              await FilePickerCross
+                                                  .importFromStorage(
+                                            type: FileTypeCross.image,
+                                          );
 
-                                        productProvider
-                                            .updateSelectedProductImage(
-                                                file.path!);
-                                      } catch (e) {
+                                          productProvider
+                                              .updateSelectedProductImage(
+                                                  file.path!);
+                                        } catch (e) {
+                                          productProvider.stateLoaging(false);
+                                          return;
+                                        }
                                         productProvider.stateLoaging(false);
-                                        return;
                                       }
-                                      productProvider.stateLoaging(false);
-                                    }
-                                  : null,
-                              child: Row(
-                                children: const [
-                                  Text('Subir imágen '),
-                                  Icon(FluentIcons.upload)
-                                ],
-                              )),
+                                    : null,
+                                child: Wrap(
+                                  children: const [
+                                    Text('Subir imágen '),
+                                    Icon(FluentIcons.upload)
+                                  ],
+                                )),
+                          ),
                           const SizedBox(
                             width: 30,
                           ),
-                          Button(
-                              onPressed: !productProvider.isSaving
-                                  ? () {
-                                      productProvider.stateSaving(true);
-                                      product.name = controllers[0].text;
-                                      product.classroom = controllers[1].text;
-                                      product.description = controllers[2].text;
-                                      productProvider.updateProduct();
-                                      productProvider.stateSaving(false);
-                                    }
-                                  : null,
-                              child: const Text('Guardar información'))
+                          MouseRegion(
+                            cursor: SystemMouseCursors.click,
+                            child: Button(
+                                onPressed: !productProvider.isSaving
+                                    ? () {
+                                        if (controllers[0].text != '' &&
+                                            controllers[1].text != '' &&
+                                            controllers[2].text != '') {
+                                          product.name = controllers[0].text;
+                                          product.classroom =
+                                              controllers[1].text;
+                                          product.description =
+                                              controllers[2].text;
+                                          productProvider.updateProduct();
+                                        }
+                                      }
+                                    : null,
+                                child: const Text('Guardar información')),
+                          )
                         ],
                       ),
                     )

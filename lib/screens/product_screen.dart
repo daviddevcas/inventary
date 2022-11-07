@@ -13,13 +13,16 @@ class ProductScreen extends StatelessWidget {
 
     return NavigationView(
       pane: NavigationPane(
-          header: Button(
-            onPressed: () {
-              adminProvider.updateProducts();
-              Navigator.pop(context);
-            },
-            child: const Text(
-              'Regresar',
+          header: MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: Button(
+              onPressed: () {
+                adminProvider.updateProducts();
+                Navigator.pop(context);
+              },
+              child: const Text(
+                'Regresar',
+              ),
             ),
           ),
           displayMode: PaneDisplayMode.top,
@@ -29,15 +32,19 @@ class ProductScreen extends StatelessWidget {
           },
           items: [
             PaneItem(
+                mouseCursor: SystemMouseCursors.click,
                 icon: const Icon(FluentIcons.screen_time),
                 title: const Text('Información'),
                 body: InformationPage(
                   productProvider: productProvider,
                 )),
             PaneItem(
+                mouseCursor: SystemMouseCursors.click,
                 icon: const Icon(FluentIcons.product),
                 title: const Text('Reportes'),
-                body: Container())
+                body: ReportsPage(
+                  productProvider: productProvider,
+                ))
           ]),
     );
   }

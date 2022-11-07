@@ -9,6 +9,8 @@ class AdminProvider extends ChangeNotifier {
   List<User> users = [];
   List<Product> products = [];
 
+  bool isUpdateUsers = false, isUpdateProducts = false;
+
   final adminService = AdminService();
 
   void hoverProduct(Product product) {
@@ -22,15 +24,17 @@ class AdminProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateUsers() {
-    adminService.getUsers().then((value) {
-      var map = value;
+  Future updateUsers() async {
+    isUpdateUsers = true;
+    notifyListeners();
+    Map<String, dynamic> map = await adminService.getUsers();
 
-      if (map['success'] == true) {
-        users = map['users'];
-        notifyListeners();
-      }
-    });
+    if (map['success'] == true) {
+      users = map['users'];
+    }
+
+    isUpdateUsers = false;
+    notifyListeners();
   }
 
   void updateUser(User user) {
@@ -38,14 +42,14 @@ class AdminProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateProducts() {
-    adminService.getProducts().then((value) {
-      var map = value;
-
-      if (map['success'] == true) {
-        products = map['products'];
-        notifyListeners();
-      }
-    });
+  Future updateProducts() async {
+    isUpdateProducts = true;
+    notifyListeners();
+    Map<String, dynamic> map = await adminService.getProducts();
+    if (map['success'] == true) {
+      products = map['products'];
+    }
+    isUpdateProducts = false;
+    notifyListeners();
   }
 }

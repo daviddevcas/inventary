@@ -66,6 +66,21 @@ class AdminService {
     return {'products': products, 'success': true};
   }
 
+  Future<Map<String, dynamic>> getProduct(String id) async {
+    Product? product;
+
+    try {
+      final request = await _dio.get(
+        '/inventario/productos/$id.json',
+      );
+
+      product = Product.fromJson(request.data);
+    } catch (e) {
+      return {'success': false};
+    }
+    return {'product': product, 'success': true};
+  }
+
   Future<Map<String, dynamic>> updateProduct(
       Product product, File? file) async {
     try {

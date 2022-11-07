@@ -1,10 +1,10 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:kikis_app/models/product.dart';
+import 'package:kikis_app/models/report.dart';
 import 'package:kikis_app/providers/admin_provider.dart';
 import 'package:kikis_app/providers/product_provider.dart';
 import 'package:kikis_app/screens/product_screen.dart';
-import 'package:kikis_app/ui/image_path.dart';
+import 'package:kikis_app/widgets/image_path.dart';
 import 'package:provider/provider.dart';
 
 class ProductsPage extends StatelessWidget {
@@ -23,11 +23,16 @@ class ProductsPage extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 30),
           child: Row(children: [
-            Button(
-                onPressed: () {
-                  adminProvider.updateProducts();
-                },
-                child: const Text('Actualizar'))
+            MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: Button(
+                  onPressed: !adminProvider.isUpdateProducts
+                      ? () {
+                          adminProvider.updateProducts();
+                        }
+                      : null,
+                  child: const Text('Actualizar')),
+            )
           ]),
         ),
         Expanded(
@@ -63,6 +68,7 @@ class ProductWidget extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         productProvider.product = product;
+
         Navigator.push(context,
             FluentPageRoute(builder: (context) => const ProductScreen()));
       },

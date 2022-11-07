@@ -37,12 +37,14 @@ class AdminScreen extends StatelessWidget {
           ),
           items: [
             PaneItem(
+                mouseCursor: SystemMouseCursors.click,
                 icon: const Icon(FluentIcons.user_window),
                 title: const Text('Usuarios'),
                 body: PanelPage(
                   adminProvider: adminProvider,
                 )),
             PaneItem(
+                mouseCursor: SystemMouseCursors.click,
                 icon: const Icon(FluentIcons.product),
                 title: const Text('Menú'),
                 body: ProductsPage(
