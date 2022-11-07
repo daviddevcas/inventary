@@ -1,6 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:kikis_app/models/report.dart';
 import 'package:kikis_app/providers/product_provider.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 class ReportsPage extends StatelessWidget {
   const ReportsPage({Key? key, required this.productProvider})
@@ -44,16 +45,23 @@ class ReportsPage extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: reports
-                    .map((report) => ExpanderReport(
-                          productProvider: productProvider,
-                          report: report,
-                        ))
-                    .toList(),
-              ),
-            ),
+            child: reports.isNotEmpty
+                ? SingleChildScrollView(
+                    child: Column(
+                      children: reports
+                          .map((report) => ExpanderReport(
+                                productProvider: productProvider,
+                                report: report,
+                              ))
+                          .toList(),
+                    ),
+                  )
+                : const Center(
+                    child: Icon(
+                      FluentIcons.document_management,
+                      size: 100,
+                    ),
+                  ),
           )
         ],
       ),
@@ -158,10 +166,54 @@ class ReportPalette extends StatelessWidget {
                           report.classroom = controllers[1].text;
                           report.description = controllers[2].text;
                           productProvider.updateProduct();
+                          Alert(
+                            context: context,
+                            title: "Se ha actualizado el reporte.",
+                            buttons: [
+                              DialogButton(
+                                onPressed: () => Navigator.pop(context),
+                                width: 120,
+                                child: const Text(
+                                  "Cerrar",
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 20),
+                                ),
+                              )
+                            ],
+                          ).show();
                         }
                       }
                     : null,
                 child: const Text('Guardar')),
+          ),
+          const SizedBox(
+            width: 30,
+          ),
+          MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: Button(
+                onPressed: !productProvider.isSaving
+                    ? () {
+                        productProvider.product.reports!.remove(report);
+                        productProvider.updateProduct();
+                        Alert(
+                          context: context,
+                          title: "Se ha eliminado el reporte.",
+                          buttons: [
+                            DialogButton(
+                              onPressed: () => Navigator.pop(context),
+                              width: 120,
+                              child: const Text(
+                                "Cerrar",
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 20),
+                              ),
+                            )
+                          ],
+                        ).show();
+                      }
+                    : null,
+                child: const Text('Eliminar')),
           )
         ]),
       )

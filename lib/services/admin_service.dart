@@ -49,7 +49,7 @@ class AdminService {
 
     try {
       final request = await _dio.get(
-        '/inventario/productos.json',
+        '/inventario/productos.json?orderBy="nombre"&limitToLast=100',
       );
 
       final Map<String, dynamic> maps = request.data;
@@ -85,14 +85,25 @@ class AdminService {
       Product product, File? file) async {
     try {
       if (file != null) {
-        _uploadImage(file).then((value) {
-          product.pathPhoto = value;
-          _dio.put('/inventario/productos/${product.id}.json',
-              data: product.toJson());
-        });
+        if (product.id != null) {
+          _uploadImage(file).then((value) {
+            product.pathPhoto = value;
+            _dio.put('/inventario/productos/${product.id}.json',
+                data: product.toJson());
+          });
+        } else {
+          _uploadImage(file).then((value) {
+            product.pathPhoto = value;
+            _dio.post('/inventario/productos.json', data: product.toJson());
+          });
+        }
       } else {
-        await _dio.put('/inventario/productos/${product.id}.json',
-            data: product.toJson());
+        if (product.id != null) {
+          await _dio.put('/inventario/productos/${product.id}.json',
+              data: product.toJson());
+        } else {
+          _dio.post('/inventario/productos.json', data: product.toJson());
+        }
       }
     } catch (e) {
       return {'success': false};

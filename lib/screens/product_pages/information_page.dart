@@ -3,6 +3,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:kikis_app/widgets/image_path.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:kikis_app/providers/product_provider.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 class InformationPage extends StatelessWidget {
   InformationPage({Key? key, required this.productProvider}) : super(key: key);
@@ -136,6 +137,24 @@ class InformationPage extends StatelessWidget {
                                           product.description =
                                               controllers[2].text;
                                           productProvider.updateProduct();
+                                          Alert(
+                                            context: context,
+                                            title:
+                                                "Se ha actualizado el producto.",
+                                            buttons: [
+                                              DialogButton(
+                                                onPressed: () =>
+                                                    Navigator.pop(context),
+                                                width: 120,
+                                                child: const Text(
+                                                  "Cerrar",
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 20),
+                                                ),
+                                              )
+                                            ],
+                                          ).show();
                                         }
                                       }
                                     : null,

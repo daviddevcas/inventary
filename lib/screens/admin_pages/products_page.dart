@@ -1,6 +1,5 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:kikis_app/models/product.dart';
-import 'package:kikis_app/models/report.dart';
 import 'package:kikis_app/providers/admin_provider.dart';
 import 'package:kikis_app/providers/product_provider.dart';
 import 'package:kikis_app/screens/product_screen.dart';
@@ -13,7 +12,7 @@ class ProductsPage extends StatelessWidget {
   final AdminProvider adminProvider;
   @override
   Widget build(BuildContext context) {
-    final products = adminProvider.products;
+    final products = adminProvider.getProductsInOrden();
 
     return ScaffoldPage(
       header: const PageHeader(
@@ -28,10 +27,19 @@ class ProductsPage extends StatelessWidget {
               child: Button(
                   onPressed: !adminProvider.isUpdateProducts
                       ? () {
-                          adminProvider.updateProducts();
+                          adminProvider.refreshProducts();
                         }
                       : null,
                   child: const Text('Actualizar')),
+            ),
+            const SizedBox(
+              width: 30,
+            ),
+            MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: Button(
+                  onPressed: adminProvider.addProduct,
+                  child: const Text('Crear producto')),
             )
           ]),
         ),

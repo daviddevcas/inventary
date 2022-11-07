@@ -29,7 +29,7 @@ class PanelPage extends StatelessWidget {
                   child: Button(
                       onPressed: !adminProvider.isUpdateUsers
                           ? () {
-                              adminProvider.updateUsers();
+                              adminProvider.refreshUsers();
                             }
                           : null,
                       child: const Text('Actualizar')),

@@ -24,7 +24,25 @@ class AdminProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future updateUsers() async {
+  void addProduct() {
+    if (products.length < 100) {
+      products
+          .add(Product(name: 'Producto nuevo', description: '', classroom: ''));
+      notifyListeners();
+    }
+  }
+
+  List<Product> getProductsInOrden() {
+    List<Product> products = [];
+
+    for (var i = this.products.length - 1; i >= 0; i--) {
+      products.add(this.products[i]);
+    }
+
+    return products;
+  }
+
+  Future refreshUsers() async {
     isUpdateUsers = true;
     notifyListeners();
     Map<String, dynamic> map = await adminService.getUsers();
@@ -42,7 +60,7 @@ class AdminProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future updateProducts() async {
+  Future refreshProducts() async {
     isUpdateProducts = true;
     notifyListeners();
     Map<String, dynamic> map = await adminService.getProducts();

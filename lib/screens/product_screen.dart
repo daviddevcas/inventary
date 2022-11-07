@@ -17,7 +17,7 @@ class ProductScreen extends StatelessWidget {
             cursor: SystemMouseCursors.click,
             child: Button(
               onPressed: () {
-                adminProvider.updateProducts();
+                adminProvider.refreshProducts();
                 Navigator.pop(context);
               },
               child: const Text(

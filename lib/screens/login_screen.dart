@@ -157,8 +157,8 @@ class PageOne extends StatelessWidget {
                               var map = value;
                               if (map['success'] == true) {
                                 authProvider.auth = map['auth'];
-                                adminProvider.updateUsers();
-                                adminProvider.updateProducts();
+                                adminProvider.refreshUsers();
+                                adminProvider.refreshProducts();
                                 Navigator.pushReplacementNamed(
                                     context, 'admin');
                               } else {
