@@ -44,33 +44,37 @@ class ProductProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future refreshProduct() async {
+  void refreshProduct() async {
     isLoading = true;
     notifyListeners();
 
-    String id = product.id!;
+    if (product.id != null) {
+      String id = product.id!;
 
-    var response = await adminService.getProduct(id);
+      var response = await adminService.getProduct(id);
 
-    if (response['success'] == true && response['product'] != null) {
-      product = response['product'];
-      product.id = id;
+      if (response['success'] == true && response['product'] != null) {
+        product = response['product'];
+        product.id = id;
+      }
     }
 
     isLoading = false;
     notifyListeners();
   }
 
-  Future updateProduct() async {
+  void updateProduct() async {
     isSaving = true;
     notifyListeners();
 
-    Map<String, dynamic> map =
-        await adminService.updateProduct(product, pictureFile);
+    var request = await adminService.updateProduct(product, pictureFile);
 
-    if (map['sucess'] == true) {
-      pictureFile = null;
+    if (request['success']) {
+      product = request['product'];
     }
+
+    pictureFile = null;
+
     isSaving = false;
     notifyListeners();
   }

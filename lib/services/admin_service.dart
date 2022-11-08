@@ -92,9 +92,11 @@ class AdminService {
                 data: product.toJson());
           });
         } else {
-          _uploadImage(file).then((value) {
+          _uploadImage(file).then((value) async {
             product.pathPhoto = value;
-            _dio.post('/inventario/productos.json', data: product.toJson());
+            final request = await _dio.post('/inventario/productos.json',
+                data: product.toJson());
+            product.id = request.data['name'];
           });
         }
       } else {
@@ -102,9 +104,20 @@ class AdminService {
           await _dio.put('/inventario/productos/${product.id}.json',
               data: product.toJson());
         } else {
-          _dio.post('/inventario/productos.json', data: product.toJson());
+          final request = await _dio.post('/inventario/productos.json',
+              data: product.toJson());
+          product.id = request.data['name'];
         }
       }
+    } catch (e) {
+      return {'success': false};
+    }
+    return {'success': true, 'product': product};
+  }
+
+  Future<Map<String, dynamic>> deleteProduct(String id) async {
+    try {
+      _dio.delete('/inventario/productos/$id.json');
     } catch (e) {
       return {'success': false};
     }

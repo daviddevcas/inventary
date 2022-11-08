@@ -22,6 +22,18 @@ class AdminScreen extends StatelessWidget {
             child: FlutterLogo(
               size: 25,
             ),
+          ),
+          actions: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: Button(
+                child: const Text('Cerrar sesión'),
+                onPressed: () {
+                  Navigator.pushReplacementNamed(context, 'login');
+                },
+              ),
+            ),
           )),
       pane: NavigationPane(
           displayMode: PaneDisplayMode.auto,

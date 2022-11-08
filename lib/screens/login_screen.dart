@@ -159,6 +159,8 @@ class PageOne extends StatelessWidget {
                                 authProvider.auth = map['auth'];
                                 adminProvider.refreshUsers();
                                 adminProvider.refreshProducts();
+                                authProvider.changeLoad(false);
+
                                 Navigator.pushReplacementNamed(
                                     context, 'admin');
                               } else {

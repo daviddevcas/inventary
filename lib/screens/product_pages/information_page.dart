@@ -1,20 +1,30 @@
+import 'dart:io';
+
 import 'package:file_picker_cross/file_picker_cross.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:kikis_app/providers/admin_provider.dart';
 import 'package:kikis_app/widgets/image_path.dart';
+import 'package:path_provider/path_provider.dart'
+    show getApplicationDocumentsDirectory;
+import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:kikis_app/providers/product_provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:screenshot/screenshot.dart';
 
 class InformationPage extends StatelessWidget {
   InformationPage({Key? key, required this.productProvider}) : super(key: key);
 
   final ProductProvider productProvider;
+  final ScreenshotController screenshotController = ScreenshotController();
   final List<TextEditingController> controllers = List.generate(4, (i) {
     return TextEditingController();
   });
 
   @override
   Widget build(BuildContext context) {
+    final adminProvider = Provider.of<AdminProvider>(context, listen: false);
+
     final product = productProvider.product;
 
     controllers[0].text = product.name;
@@ -31,18 +41,72 @@ class InformationPage extends StatelessWidget {
             child: Center(
               child: product.id == null
                   ? const ProgressRing()
-                  : QrImage(
-                      data: product.id!,
-                      version: QrVersions.auto,
-                      size: 320,
-                      errorStateBuilder: (cxt, err) {
-                        return const Center(
-                          child: Text(
-                            'Ha ocurrido algún problema...',
-                            textAlign: TextAlign.center,
+                  : Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Screenshot(
+                          controller: screenshotController,
+                          child: QrImage(
+                            data: product.id!,
+                            version: QrVersions.auto,
+                            size: 320,
+                            errorStateBuilder: (cxt, err) {
+                              return const Center(
+                                child: Text(
+                                  'Ha ocurrido algún problema...',
+                                  textAlign: TextAlign.center,
+                                ),
+                              );
+                            },
                           ),
-                        );
-                      },
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: MouseRegion(
+                            cursor: SystemMouseCursors.click,
+                            child: Button(
+                                onPressed: () async {
+                                  try {
+                                    await screenshotController
+                                        .capture(
+                                            delay: const Duration(
+                                                milliseconds: 10))
+                                        .then((image) async {
+                                      if (image != null) {
+                                        final directory =
+                                            await getApplicationDocumentsDirectory();
+                                        final imagePath = await File(
+                                                '${directory.path}/qr-${product.id}.png')
+                                            .create();
+                                        await imagePath.writeAsBytes(image);
+                                        Alert(
+                                          context: context,
+                                          title:
+                                              "Se ha almacenado la imagen en documentos.",
+                                          buttons: [
+                                            DialogButton(
+                                              onPressed: () =>
+                                                  Navigator.pop(context),
+                                              width: 120,
+                                              child: const Text(
+                                                "Cerrar",
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 20),
+                                              ),
+                                            )
+                                          ],
+                                        ).show();
+                                      }
+                                    });
+                                  } catch (e) {
+                                    return;
+                                  }
+                                },
+                                child: const Text('Obtener imagen')),
+                          ),
+                        )
+                      ],
                     ),
             ),
           ),
@@ -159,7 +223,48 @@ class InformationPage extends StatelessWidget {
                                       }
                                     : null,
                                 child: const Text('Guardar información')),
-                          )
+                          ),
+                          const SizedBox(
+                            width: 30,
+                          ),
+                          MouseRegion(
+                              cursor: SystemMouseCursors.click,
+                              child: Button(
+                                child: const Text('Eliminar'),
+                                onPressed: () {
+                                  Alert(
+                                    context: context,
+                                    title: "¿Desea eliminar el producto?",
+                                    buttons: [
+                                      DialogButton(
+                                        onPressed: () async {
+                                          adminProvider.subProduct(product);
+
+                                          Navigator.pop(context);
+                                          Navigator.pop(context);
+                                        },
+                                        width: 120,
+                                        child: const Text(
+                                          "Eliminar",
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 20),
+                                        ),
+                                      ),
+                                      DialogButton(
+                                        onPressed: () => Navigator.pop(context),
+                                        width: 120,
+                                        child: const Text(
+                                          "Cerrar",
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 20),
+                                        ),
+                                      )
+                                    ],
+                                  ).show();
+                                },
+                              ))
                         ],
                       ),
                     )

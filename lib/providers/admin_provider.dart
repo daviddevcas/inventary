@@ -24,14 +24,6 @@ class AdminProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void addProduct() {
-    if (products.length < 100) {
-      products
-          .add(Product(name: 'Producto nuevo', description: '', classroom: ''));
-      notifyListeners();
-    }
-  }
-
   List<Product> getProductsInOrden() {
     List<Product> products = [];
 
@@ -42,7 +34,23 @@ class AdminProvider extends ChangeNotifier {
     return products;
   }
 
-  Future refreshUsers() async {
+  void addProduct() async {
+    if (products.length < 100) {
+      products
+          .add(Product(name: 'Producto nuevo', description: '', classroom: ''));
+      notifyListeners();
+    }
+  }
+
+  void subProduct(Product product) async {
+    if (product.id != null) {
+      adminService.deleteProduct(product.id!);
+    }
+    products.remove(product);
+    notifyListeners();
+  }
+
+  void refreshUsers() async {
     isUpdateUsers = true;
     notifyListeners();
     Map<String, dynamic> map = await adminService.getUsers();
@@ -60,7 +68,7 @@ class AdminProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future refreshProducts() async {
+  void refreshProducts() async {
     isUpdateProducts = true;
     notifyListeners();
     Map<String, dynamic> map = await adminService.getProducts();

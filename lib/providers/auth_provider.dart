@@ -5,7 +5,7 @@ class AuthProvider extends ChangeNotifier {
   bool _inLoad = false;
   List<String> errorBag = [];
 
-  late final Auth? auth;
+  Auth? auth;
 
   bool get inLoad => _inLoad;
 

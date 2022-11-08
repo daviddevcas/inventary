@@ -21,7 +21,7 @@ class ProductsPage extends StatelessWidget {
       content: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 30),
-          child: Row(children: [
+          child: Wrap(children: [
             MouseRegion(
               cursor: SystemMouseCursors.click,
               child: Button(
@@ -38,8 +38,17 @@ class ProductsPage extends StatelessWidget {
             MouseRegion(
               cursor: SystemMouseCursors.click,
               child: Button(
-                  onPressed: adminProvider.addProduct,
+                  onPressed: () {
+                    adminProvider.addProduct();
+                  },
                   child: const Text('Crear producto')),
+            ),
+            const SizedBox(
+              width: 30,
+            ),
+            MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: Button(onPressed: () {}, child: const Text('Escanear')),
             )
           ]),
         ),
