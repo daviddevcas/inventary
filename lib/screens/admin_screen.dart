@@ -12,12 +12,16 @@ class AdminScreen extends StatelessWidget {
     final adminProvider = Provider.of<AdminProvider>(context);
     final authProvider = Provider.of<AuthProvider>(context);
 
+    double width = MediaQuery.of(context).size.width;
+
     return NavigationView(
       appBar: NavigationAppBar(
-          title: Text(
-            "Bienvenido ${authProvider.auth?.name ?? ''}",
-            style: const TextStyle(fontSize: 19),
-          ),
+          title: width > 1024
+              ? Text(
+                  "Bienvenido ${authProvider.auth?.name ?? ''}",
+                  style: const TextStyle(fontSize: 19),
+                )
+              : null,
           leading: const Center(
             child: FlutterLogo(
               size: 25,

@@ -2,10 +2,12 @@ class Report {
   Report(
       {required this.subject,
       required this.description,
-      required this.classroom});
+      required this.classroom,
+      this.verified});
   String subject;
   String description;
   String classroom;
+  bool? verified;
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
@@ -13,6 +15,7 @@ class Report {
     data['asunto'] = subject;
     data['descripcion'] = description;
     data['aula'] = classroom;
+    data['verified'] = verified ?? false;
 
     return data;
   }
@@ -21,6 +24,7 @@ class Report {
     return Report(
         subject: data['asunto'],
         description: data['descripcion'],
-        classroom: data['aula']);
+        classroom: data['aula'],
+        verified: data['verified'] ?? false);
   }
 }

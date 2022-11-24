@@ -11,13 +11,46 @@ import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
 class LoginScreen extends StatelessWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  LoginScreen({Key? key}) : super(key: key);
+
+  final PageController pageController = PageController();
+  final LoginService loginService = LoginService();
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
+    double width = MediaQuery.of(context).size.width;
+
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: Row(children: [const LeftPart(), RightPart()]),
+      body: width > 1024
+          ? Row(children: [
+              const LeftPart(),
+              RightPart(
+                alpha: 145,
+                pageController: pageController,
+                authProvider: authProvider,
+                loginService: loginService,
+              )
+            ])
+          : Stack(
+              fit: StackFit.expand,
+              children: [
+                const BackgroundLogin(),
+                Container(
+                  padding: const EdgeInsets.all(15),
+                  child: LogPart(
+                      alpha: 230,
+                      pageController: pageController,
+                      loginService: loginService,
+                      authProvider: authProvider),
+                ),
+                if (authProvider.inLoad)
+                  Container(
+                      color: const Color.fromARGB(100, 255, 255, 255),
+                      child: const Center(child: CircularProgressIndicator()))
+              ],
+            ),
     );
   }
 }
@@ -32,15 +65,7 @@ class LeftPart extends StatelessWidget {
     return Expanded(
       flex: 2,
       child: Stack(fit: StackFit.expand, children: [
-        CachedNetworkImage(
-          fit: BoxFit.fill,
-          imageUrl:
-              'https://firebasestorage.googleapis.com/v0/b/inventario-24e0c.appspot.com/o/background.jpg?alt=media&token=379049c9-046e-4e05-afa8-cdb5b24baf48',
-          placeholder: (context, url) =>
-              const Center(child: CircularProgressIndicator()),
-          errorWidget: (context, url, error) =>
-              const Center(child: Icon(Icons.error)),
-        ),
+        const BackgroundLogin(),
         Container(
           decoration: const BoxDecoration(
               gradient: LinearGradient(colors: [
@@ -62,44 +87,93 @@ class LeftPart extends StatelessWidget {
   }
 }
 
-class RightPart extends StatelessWidget {
-  RightPart({
+class BackgroundLogin extends StatelessWidget {
+  const BackgroundLogin({
     Key? key,
   }) : super(key: key);
 
-  final PageController _pageController = PageController();
-  final LoginService _loginService = LoginService();
+  @override
+  Widget build(BuildContext context) {
+    return CachedNetworkImage(
+      fit: BoxFit.fill,
+      imageUrl:
+          'https://firebasestorage.googleapis.com/v0/b/inventario-24e0c.appspot.com/o/background.jpg?alt=media&token=379049c9-046e-4e05-afa8-cdb5b24baf48',
+      placeholder: (context, url) =>
+          const Center(child: CircularProgressIndicator()),
+      errorWidget: (context, url, error) =>
+          const Center(child: Icon(Icons.error)),
+    );
+  }
+}
+
+class RightPart extends StatelessWidget {
+  const RightPart({
+    Key? key,
+    required this.pageController,
+    required this.loginService,
+    required this.authProvider,
+    required this.alpha,
+  }) : super(key: key);
+
+  final PageController pageController;
+  final LoginService loginService;
+  final AuthProvider authProvider;
+  final int alpha;
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthProvider>(context);
-
     return Expanded(
       child: Stack(
         fit: StackFit.expand,
         children: [
-          Container(
-            color: const Color.fromARGB(146, 0, 62, 121),
-            child: PageView(
-              controller: _pageController,
-              children: [
-                PageOne(
-                  pageController: _pageController,
-                  loginService: _loginService,
-                  authProvider: authProvider,
-                ),
-                PageTwo(
-                  pageController: _pageController,
-                  loginService: _loginService,
-                  authProvider: authProvider,
-                )
-              ],
-            ),
-          ),
+          LogPart(
+              alpha: alpha,
+              pageController: pageController,
+              loginService: loginService,
+              authProvider: authProvider),
           if (authProvider.inLoad)
             Container(
                 color: const Color.fromARGB(100, 255, 255, 255),
                 child: const Center(child: CircularProgressIndicator()))
+        ],
+      ),
+    );
+  }
+}
+
+class LogPart extends StatelessWidget {
+  const LogPart({
+    Key? key,
+    required PageController pageController,
+    required LoginService loginService,
+    required this.authProvider,
+    required this.alpha,
+  })  : _pageController = pageController,
+        _loginService = loginService,
+        super(key: key);
+
+  final PageController _pageController;
+  final LoginService _loginService;
+  final AuthProvider authProvider;
+  final int alpha;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Color.fromARGB(alpha, 0, 62, 121),
+      child: PageView(
+        controller: _pageController,
+        children: [
+          PageOne(
+            pageController: _pageController,
+            loginService: _loginService,
+            authProvider: authProvider,
+          ),
+          PageTwo(
+            pageController: _pageController,
+            loginService: _loginService,
+            authProvider: authProvider,
+          )
         ],
       ),
     );
