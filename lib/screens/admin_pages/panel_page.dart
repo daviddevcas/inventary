@@ -67,47 +67,50 @@ class DataTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return material.DataTable(
-      columns: <material.DataColumn>[
-        material.DataColumn(
-            label: Text(
-          "ID",
-          style: styleColumn(),
-        )),
-        material.DataColumn(
-            label: Text(
-          "Nombre",
-          style: styleColumn(),
-        )),
-        material.DataColumn(
-          label: Text(
-            "Correo",
+    return SizedBox(
+      width: double.infinity,
+      child: material.DataTable(
+        columns: <material.DataColumn>[
+          material.DataColumn(
+              label: Text(
+            "ID",
             style: styleColumn(),
-          ),
-        ),
-        material.DataColumn(
+          )),
+          material.DataColumn(
+              label: Text(
+            "Nombre",
+            style: styleColumn(),
+          )),
+          material.DataColumn(
             label: Text(
-          "Estado",
-          style: styleColumn(),
-        )),
-      ],
-      rows: users
-          .map((user) => material.DataRow(cells: [
-                material.DataCell(Text(user.id!)),
-                material.DataCell(Text(user.name)),
-                material.DataCell(Text(user.email)),
-                material.DataCell(MouseRegion(
-                  cursor: SystemMouseCursors.click,
-                  child: Checkbox(
-                    checked: user.status,
-                    onChanged: (value) {
-                      user.status = value!;
-                      adminProvider.updateUser(user);
-                    },
-                  ),
-                )),
-              ]))
-          .toList(),
+              "Correo",
+              style: styleColumn(),
+            ),
+          ),
+          material.DataColumn(
+              label: Text(
+            "Estado",
+            style: styleColumn(),
+          )),
+        ],
+        rows: users
+            .map((user) => material.DataRow(cells: [
+                  material.DataCell(Text(user.id!)),
+                  material.DataCell(Text(user.name)),
+                  material.DataCell(Text(user.email)),
+                  material.DataCell(MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: Checkbox(
+                      checked: user.status,
+                      onChanged: (value) {
+                        user.status = value!;
+                        adminProvider.updateUser(user);
+                      },
+                    ),
+                  )),
+                ]))
+            .toList(),
+      ),
     );
   }
 
