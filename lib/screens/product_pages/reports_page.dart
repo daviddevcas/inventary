@@ -136,7 +136,21 @@ class ReportPalette extends StatelessWidget {
                   header: 'Aula',
                   placeholder: 'Aula',
                   controller: controllers[1],
-                ))
+                )),
+            const SizedBox(
+              width: 60,
+            ),
+            Expanded(
+                child: Center(
+              child: Checkbox(
+                content: const Text('Problema atendido'),
+                checked: report.verified ?? false,
+                onChanged: (value) {
+                  report.verified = value!;
+                  productProvider.verifiedReport(report);
+                },
+              ),
+            ))
           ],
         ),
       ),

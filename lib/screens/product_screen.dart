@@ -12,7 +12,7 @@ class ProductScreen extends StatelessWidget {
     final adminProvider = Provider.of<AdminProvider>(context, listen: false);
 
     return NavigationView(
-      appBar: const NavigationAppBar(),
+      appBar: const NavigationAppBar(height: 0),
       pane: NavigationPane(
           header: MouseRegion(
             cursor: SystemMouseCursors.click,

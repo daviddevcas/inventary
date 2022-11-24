@@ -7,7 +7,6 @@ import 'package:kikis_app/services/admin_service.dart';
 
 class ProductProvider extends ChangeNotifier {
   Product product = Product(name: '', description: '', classroom: '');
-  List<Report> reports = [];
 
   bool isLoading = false, isSaving = false;
   int page = 0;
@@ -77,5 +76,13 @@ class ProductProvider extends ChangeNotifier {
 
     isSaving = false;
     notifyListeners();
+  }
+
+  void verifiedReport(Report report) {
+    if (product.reports != null) {
+      int index = product.reports!.indexOf(report);
+      product.reports![index] = report;
+      notifyListeners();
+    }
   }
 }

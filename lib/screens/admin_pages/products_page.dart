@@ -1,10 +1,14 @@
+import 'dart:io' show Platform;
+
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:kikis_app/models/product.dart';
 import 'package:kikis_app/providers/admin_provider.dart';
 import 'package:kikis_app/providers/product_provider.dart';
 import 'package:kikis_app/screens/product_screen.dart';
 import 'package:kikis_app/widgets/image_path.dart';
 import 'package:provider/provider.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 class ProductsPage extends StatelessWidget {
   const ProductsPage({Key? key, required this.adminProvider}) : super(key: key);
@@ -13,6 +17,7 @@ class ProductsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final products = adminProvider.getProductsInOrden();
+    final productProvider = Provider.of<ProductProvider>(context);
 
     return ScaffoldPage(
       header: const PageHeader(
@@ -46,24 +51,63 @@ class ProductsPage extends StatelessWidget {
             const SizedBox(
               width: 30,
             ),
-            MouseRegion(
-              cursor: SystemMouseCursors.click,
-              child: Button(onPressed: () {}, child: const Text('Escanear')),
-            )
+            if (Platform.isAndroid)
+              MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: Button(
+                    onPressed: () {
+                      FlutterBarcodeScanner.scanBarcode(
+                              '#3D8BEF', 'Cancelar', false, ScanMode.QR)
+                          .then((value) {
+                        if (value != '-1') {
+                          Product product = adminProvider.products
+                              .firstWhere((product) => product.id == value);
+
+                          productProvider.product = product;
+
+                          Navigator.push(
+                              context,
+                              FluentPageRoute(
+                                  builder: (context) => const ProductScreen()));
+                        } else {
+                          Alert(
+                            context: context,
+                            title: "Producto no encontrado.",
+                            buttons: [
+                              DialogButton(
+                                onPressed: () => Navigator.pop(context),
+                                width: 120,
+                                child: const Text(
+                                  "Cerrar",
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 20),
+                                ),
+                              )
+                            ],
+                          ).show();
+                        }
+                      });
+                    },
+                    child: const Text('Escanear')),
+              )
           ]),
         ),
         Expanded(
             child: SingleChildScrollView(
           child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+            padding: const EdgeInsets.symmetric(vertical: 15),
+            child: Center(
               child: Wrap(
                 children: products
                     .map((product) => ProductWidget(
+                          productProvider: productProvider,
                           adminProvider: adminProvider,
                           product: product,
                         ))
                     .toList(),
-              )),
+              ),
+            ),
+          ),
         ))
       ]),
     );
@@ -72,15 +116,19 @@ class ProductsPage extends StatelessWidget {
 
 class ProductWidget extends StatelessWidget {
   const ProductWidget(
-      {Key? key, required this.product, required this.adminProvider})
+      {Key? key,
+      required this.product,
+      required this.adminProvider,
+      required this.productProvider})
       : super(key: key);
 
   final AdminProvider adminProvider;
+  final ProductProvider productProvider;
   final Product product;
 
   @override
   Widget build(BuildContext context) {
-    final productProvider = Provider.of<ProductProvider>(context);
+    double width = MediaQuery.of(context).size.width;
 
     return GestureDetector(
       onTap: () {
@@ -90,12 +138,16 @@ class ProductWidget extends StatelessWidget {
             FluentPageRoute(builder: (context) => const ProductScreen()));
       },
       child: MouseRegion(
-          onEnter: (event) {
-            adminProvider.hoverProduct(product);
-          },
-          onExit: (event) {
-            adminProvider.hoverProduct(product);
-          },
+          onEnter: width > 1024
+              ? (event) {
+                  adminProvider.hoverProduct(product);
+                }
+              : null,
+          onExit: width > 1024
+              ? (event) {
+                  adminProvider.hoverProduct(product);
+                }
+              : null,
           cursor: SystemMouseCursors.click,
           child: AnimatedContainer(
             margin: const EdgeInsets.all(10),
